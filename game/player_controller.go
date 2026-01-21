@@ -103,22 +103,16 @@ func (c *playerController) Take(gameState State, deck *Deck, pile *Pile) (int, b
 		return op, false, err
 	}
 	if len(tiles) == 0 {
-		switch op {
-		case consts.CHI:
-			c.TryTopDecking(deck)
-		case consts.PENG:
-			if gameState.OriginallyPlayer.ID() == c.ID() {
-				c.TryTopDecking(deck)
-			}
-		case consts.GANG:
-			if gameState.OriginallyPlayer.ID() == c.ID() {
-				c.TryTopDecking(deck)
-			}
-		}
+		// Player chose not to perform any operation
+		// Record that this player declined the opportunity
 		pile.AddSayNoPlayer(c)
 		return op, false, nil
 	}
+
+	// Player performed an operation (chi/peng/gang)
+	// Draw a tile from the bottom of the pile
 	c.AddTiles([]int{pile.BottomDrawOne()})
+	// Record the operation with the tiles involved
 	c.operation(op, int(pile.LastPlayer().ID()), tiles)
 	return op, true, nil
 }

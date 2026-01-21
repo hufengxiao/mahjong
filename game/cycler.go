@@ -12,6 +12,8 @@ type Cycler struct {
 }
 
 func NewCycler(elements []int) *Cycler {
+	// Initialize current to last element (len-1) so that the first call to Next() cycles to the first element (0)
+	// This allows Current() to be called safely after initialization
 	return &Cycler{
 		elements:  elements,
 		current:   len(elements) - 1,

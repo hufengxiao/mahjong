@@ -28,7 +28,10 @@ func (p *Pile) SayNoPlayer() map[int]*playerController {
 }
 
 func NewPile() *Pile {
-	return &Pile{tiles: make([]int, 0, 144)}
+	return &Pile{
+		tiles:       make([]int, 0, 144),
+		sayNoPlayer: make(map[int]*playerController),
+	}
 }
 
 func (p *Pile) SetOriginallyPlayer(player *playerController) {

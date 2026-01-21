@@ -25,6 +25,10 @@ func (d *Deck) DrawOne() int {
 }
 
 func (d *Deck) Draw(amount int) []int {
+	if amount > len(d.tiles) {
+		// Return only what's available to prevent panic
+		amount = len(d.tiles)
+	}
 	tiles := d.tiles[0:amount]
 	d.tiles = d.tiles[amount:]
 	return tiles

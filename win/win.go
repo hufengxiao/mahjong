@@ -27,11 +27,14 @@ func CanWin(handTiles, showTiles []int) bool {
 
 	// 地龙
 	// 手牌有5对;明牌3张;明牌三张相同;且手牌的孤张与明牌相同
-	if len(pos) == 5 &&
-		len(showTiles) == 3 &&
-		showTiles[0] == showTiles[1] && showTiles[0] == showTiles[2] &&
-		util.IntInSlice(showTiles[0], handTiles) {
-		return true
+	if len(pos) == 5 && len(showTiles) == 3 {
+		// Check if all 3 show tiles are the same (must be a triplet)
+		if showTiles[0] == showTiles[1] && showTiles[1] == showTiles[2] {
+			// Check if this tile exists in the hand tiles
+			if util.IntInSlice(showTiles[0], handTiles) {
+				return true
+			}
+		}
 	}
 
 	// 遍历所有对，因为胡必须有对
@@ -92,6 +95,10 @@ func IsAllSequenceOrTriplet(sortedTiles []int) bool {
 // FindAndRemoveTriplet 从已排序的[]int中移除排头的刻子
 func FindAndRemoveTriplet(sortedTiles *[]int) bool {
 	var v = *sortedTiles
+	// Need at least 3 tiles to form a triplet
+	if len(v) < 3 {
+		return false
+	}
 	if IsTriplet(v[0], v[1], v[2]) {
 		*sortedTiles = append([]int{}, v[3:]...)
 		return true
@@ -102,6 +109,10 @@ func FindAndRemoveTriplet(sortedTiles *[]int) bool {
 // FindAndRemoveSequence 从已排序的[]int中移除排头的顺子
 func FindAndRemoveSequence(sortedTiles *[]int) bool {
 	var v = *sortedTiles
+	// Need at least 3 tiles to form a sequence
+	if len(v) < 3 {
+		return false
+	}
 	var tmp = make([]int, 0)
 	for i := 1; i < len(v); i++ {
 		switch {
@@ -109,6 +120,10 @@ func FindAndRemoveSequence(sortedTiles *[]int) bool {
 			tmp = append(tmp, v[i])
 		case v[i] == v[i-1]+1:
 			if v[i]-v[0] == 2 {
+				// Verify it's actually a valid sequence (same suit)
+				if !IsSequence(v[0], v[i-1], v[i]) {
+					return false
+				}
 				tmp = append(tmp, v[i+1:]...)
 				*sortedTiles = tmp
 				return true
@@ -125,6 +140,10 @@ func FindAndRemoveSequence(sortedTiles *[]int) bool {
 // 非万、筒、条肯定不是顺
 func IsSequence(tileA, tileB, tileC int) bool {
 	if !card.IsSuit(tileA) || !card.IsSuit(tileB) || !card.IsSuit(tileC) {
+		return false
+	}
+	// Check if all three tiles are of the same type (same suit)
+	if !card.IsSameType(tileA, tileB) || !card.IsSameType(tileB, tileC) {
 		return false
 	}
 	if tileB == tileA+1 && tileC == tileB+1 {
